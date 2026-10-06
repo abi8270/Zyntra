@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ZYNTRA | Quantum Drone Coordination</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, #16213e 0%, #080b14 40%, #05070d 100%);
+            color: #e8ecff;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        header {
+            padding: 35px 0 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .logo {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: 5px;
+        }
+
+        .tagline {
+            margin-top: 8px;
+            color: #9ba7c7;
+            font-size: 16px;
+        }
+
+        .event {
+            margin-top: 12px;
+            color: #7dd3fc;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .status {
+            padding: 9px 14px;
+            border-radius: 20px;
+            background: rgba(50,255,180,0.08);
+            border: 1px solid rgba(50,255,180,0.25);
+            color: #62f5b0;
+            font-size: 13px;
+        }
+
+        section {
+            margin-top: 35px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            background: rgba(15,20,35,0.82);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        .card:hover {
+            border-color: rgba(125,211,252,0.3);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #aeb8d0;
+            margin: 7px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .critical {
+            background: rgba(255,70,90,0.15);
+            color: #ff6f7d;
+        }
+
+        .high {
+            background: rgba(255,170,50,0.15);
+            color: #ffc267;
+        }
+
+        .medium {
+            background: rgba(255,220,70,0.12);
+            color: #ffe477;
+        }
+
+        .low {
+            background: rgba(60,220,140,0.12);
+            color: #68e6a1;
+        }
+
+        .control-card {
+            background: rgba(13,18,32,0.9);
+            border: 1px solid rgba(125,211,252,0.12);
+            border-radius: 18px;
+            padding: 22px;
+        }
+
+        .control-row {
+            margin-bottom: 22px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .control-header strong {
+            font-size: 16px;
+        }
+
+        .value {
+            color: #7dd3fc;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #7dd3fc;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 11px;
+            margin-top: 7px;
+            background: #0b1020;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 9px;
+        }
+
+        label {
+            color: #9da8c2;
+            font-size: 13px;
+        }
+
+        .zone-control {
+            display: grid;
+            grid-template-columns: 70px 1fr 1fr;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 18px;
+        }
+
+        .zone-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #7dd3fc;
+        }
+
+        .button-area {
+            text-align: center;
+            margin: 35px 0;
+        }
+
+        button {
+            border: none;
+            padding: 15px 28px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(56,189,248,0.18);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .pipeline-item {
+            padding: 13px 18px;
+            border-radius: 12px;
+            background: rgba(125,211,252,0.08);
+            border: 1px solid rgba(125,211,252,0.18);
+            color: #b9eaff;
+        }
+
+        .arrow {
+            color: #64748b;
+        }
+
+        .log {
+            background: #03050a;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 20px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            min-height: 260px;
+            max-height: 360px;
+            overflow-y: auto;
+            color: #70f6a8;
+        }
+
+        .log-line {
+            margin-bottom: 2px;
+        }
+
+        .assignment-card {
+            position: relative;
+        }
+
+        .assignment-drone {
+            color: #7dd3fc;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .assignment-zone {
+            font-size: 34px;
+            font-weight: 800;
+            margin: 8px 0 15px;
+        }
+
+        .assignment-card p {
+            font-size: 14px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .metric-label {
+            color: #8f9ab4;
+            font-size: 13px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .compare-card {
+            background: rgba(15,20,35,0.85);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 24px;
+        }
+
+        .compare-card h3 {
+            margin-bottom: 20px;
+        }
+
+        .compare-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: #aeb8d0;
+        }
+
+        .compare-row strong {
+            color: white;
+        }
+
+        .success-message {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(50,255,180,0.08);
+            border: 1px solid rgba(50,255,180,0.2);
+            color: #68e6a1;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding: 25px 0 35px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            color: #717b95;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        @media (max-width: 750px) {
+            .logo {
+                font-size: 30px;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .zone-control {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline {
+                flex-direction: column;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div class="logo">ZYNTRA</div>
+
+        <div class="tagline">
+            Smarter Coordination. Faster Rescue.
+        </div>
+
+        <div class="event">
+            OPEN QUANTUM INNOVATION • Q-HACK INDIA 2026
+        </div>
+
+        <div class="status-bar">
+
+            <div class="status" id="apiStatus">
+                ● CONNECTING TO API
+            </div>
+
+            <div class="status">
+                QAOA READY
+            </div>
+
+            <div class="status">
+                <span id="droneCount">3</span> DRONES
+            </div>
+
+            <div class="status">
+                <span id="zoneCount">4</span> EMERGENCY ZONES
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ACTIVE DRONES -->
+
+    <section>
+
+        <div class="section-title">
+            🚁 Active Drones
+        </div>
+
+        <div class="grid" id="droneCards"></div>
+
+    </section>
+
+
+    <!-- EMERGENCY ZONES -->
+
+    <section>
+
+        <div class="section-title">
+            🚨 Emergency Zones
+        </div>
+
+        <div class="grid" id="zoneCards"></div>
+
+    </section>
+
+
+    <!-- DYNAMIC CONTROLS -->
+
+    <section>
+
+        <div class="section-title">
+            🎛️ Live Disaster Simulator
+        </div>
+
+        <div class="card">
+
+            <p style="margin-bottom:22px;">
+                Change drone battery, affected population, or emergency
+                severity. Zyntra will rebuild the optimization problem
+                and run QAOA using the updated scenario.
+            </p>
+
+            <h3 style="margin-bottom:18px;">
+                🚁 Drone Battery
+            </h3>
+
+            <div id="batteryControls"></div>
+
+            <h3 style="margin:30px 0 18px;">
+                🚨 Emergency Conditions
+            </h3>
+
+            <div id="zoneControls"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- OPTIMIZATION -->
+
+    <section>
+
+        <div class="section-title">
+            ⚛️ Quantum-Assisted Optimization
+        </div>
+
+        <div class="card">
+
+            <p>
+                Zyntra converts the disaster-response assignment problem
+                into a QUBO and explores a QAOA solution using a quantum
+                simulator.
+            </p>
+
+            <div class="button-area">
+
+                <button
+                    id="optimizeButton"
+                    onclick="updateAndOptimize()"
+                >
+                    ⚡ UPDATE & RUN QAOA
+                </button>
+
+            </div>
+
+            <div class="pipeline">
+
+                <div class="pipeline-item">
+                    Emergency Data
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="pipeline-item">
+                    Priority Analysis
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="pipeline-item">
+                    QUBO
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="pipeline-item">
+                    QAOA
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="pipeline-item">
+                    Assignment
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- LOG -->
+
+    <section>
+
+        <div class="section-title">
+            🖥️ Optimization Log
+        </div>
+
+        <div class="log" id="logConsole">
+
+            <div class="log-line">
+                &gt; Zyntra dashboard initialized...
+            </div>
+
+            <div class="log-line">
+                &gt; Connecting to local optimization engine...
+            </div>
+
+            <div class="log-line">
+                &gt; Waiting for optimization request...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ASSIGNMENTS -->
+
+    <section>
+
+        <div class="section-title">
+            🎯 Optimized Drone Assignment
+        </div>
+
+        <div class="grid" id="assignmentCards"></div>
+
+    </section>
+
+
+    <!-- METRICS -->
+
+    <section>
+
+        <div class="grid">
+
+            <div class="card metric">
+
+                <div class="metric-value" id="travelMetric">
+                    39
+                </div>
+
+                <div class="metric-label">
+                    Total Travel Cost
+                </div>
+
+            </div>
+
+
+            <div class="card metric">
+
+                <div class="metric-value" id="batteryMetric">
+                    105
+                </div>
+
+                <div class="metric-label">
+                    Battery Cost
+                </div>
+
+            </div>
+
+
+            <div class="card metric">
+
+                <div class="metric-value" id="peopleMetric">
+                    45
+                </div>
+
+                <div class="metric-label">
+                    People Covered
+                </div>
+
+            </div>
+
+
+            <div class="card metric">
+
+                <div class="metric-value" id="scoreMetric">
+                    342.00
+                </div>
+
+                <div class="metric-label">
+                    QAOA Score
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CLASSICAL VS QAOA -->
+
+    <section>
+
+        <div class="section-title">
+            ⚖️ Classical vs QAOA
+        </div>
+
+        <div class="comparison">
+
+            <!-- CLASSICAL -->
+
+            <div class="compare-card">
+
+                <h3>
+                    Classical Baseline
+                </h3>
+
+                <div class="compare-row">
+                    <span>Score</span>
+
+                    <strong id="classicalScore">
+                        342.00
+                    </strong>
+                </div>
+
+                <div class="compare-row">
+                    <span>Travel Cost</span>
+
+                    <strong id="classicalTravel">
+                        39
+                    </strong>
+                </div>
+
+                <div class="compare-row">
+                    <span>Battery Cost</span>
+
+                    <strong id="classicalBattery">
+                        105
+                    </strong>
+                </div>
+
+                <div class="compare-row">
+                    <span>People Covered</span>
+
+                    <strong id="classicalPeople">
+                        45
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <!-- QAOA -->
+
+            <div class="compare-card">
+
+                <h3>
+                    Quantum-Assisted QAOA
+                </h3>
+
+                <div class="compare-row">
+                    <span>Score</span>
+
+                    <strong id="qaoaScore">
+                        342.00
+                    </strong>
+                </div>
+
+                <div class="compare-row">
+                    <span>Travel Cost</span>
+
+                    <strong id="qaoaTravel">
+                        39
+                    </strong>
+                </div>
+
+                <div class="compare-row">
+                    <span>Battery Cost</span>
+
+                    <strong id="qaoaBattery">
+                        105
+                    </strong>
+                </div>
+
+                <div class="compare-row">
+                    <span>People Covered</span>
+
+                    <strong id="qaoaPeople">
+                        45
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="success-message" id="comparisonMessage">
+
+            ✓ QAOA recovered the same best score as the classical baseline
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        ZYNTRA • Quantum-Assisted Autonomous Drone Coordination
+
+        <br><br>
+
+        Q-HACK INDIA 2026 • Team QubitXians
+
+        <br>
+
+        Quantum optimization prototype • QAOA executed on simulator
+
+    </footer>
+
+</div>
+
+
+<script>
+
+/* ============================================================
+   API
+============================================================ */
+
+const API_URL = "http://127.0.0.1:5000";
+
+
+/* ============================================================
+   CURRENT DATA
+============================================================ */
+
+let currentData = {
+    drones: {},
+    emergency_zones: {},
+    distance_cost: {}
+};
+
+
+/* ============================================================
+   LOG
+============================================================ */
+
+function addLog(message) {
+
+    const consoleBox =
+        document.getElementById("logConsole");
+
+    const line =
+        document.createElement("div");
+
+    line.className = "log-line";
+
+    line.innerHTML = "&gt; " + message;
+
+    consoleBox.appendChild(line);
+
+    consoleBox.scrollTop =
+        consoleBox.scrollHeight;
+}
+
+
+/* ============================================================
+   SEVERITY CLASS
+============================================================ */
+
+function severityClass(severity) {
+
+    return severity.toLowerCase();
+
+}
+
+
+/* ============================================================
+   LOAD DATA
+============================================================ */
+
+async function loadData() {
+
+    try {
+
+        addLog(
+            "Connecting to Zyntra API..."
+        );
+
+        const response =
+            await fetch(API_URL + "/api/data");
+
+        if (!response.ok) {
+            throw new Error(
+                "API data request failed"
+            );
+        }
+
+        currentData =
+            await response.json();
+
+        document.getElementById(
+            "apiStatus"
+        ).textContent =
+            "● ZYNTRA API ONLINE";
+
+        document.getElementById(
+            "droneCount"
+        ).textContent =
+            Object.keys(
+                currentData.drones
+            ).length;
+
+        document.getElementById(
+            "zoneCount"
+        ).textContent =
+            Object.keys(
+                currentData.emergency_zones
+            ).length;
+
+        addLog(
+            "API connected • " +
+            Object.keys(currentData.drones).length +
+            " drones • " +
+            Object.keys(currentData.emergency_zones).length +
+            " zones • QAOA ready"
+        );
+
+        renderDroneCards();
+        renderZoneCards();
+        renderControls();
+
+    } catch (error) {
+
+        document.getElementById(
+            "apiStatus"
+        ).textContent =
+            "● API OFFLINE";
+
+        addLog(
+            "ERROR: Could not connect to Zyntra API."
+        );
+
+        console.error(error);
+    }
+}
+
+
+/* ============================================================
+   DRONE CARDS
+============================================================ */
+
+function renderDroneCards() {
+
+    const container =
+        document.getElementById("droneCards");
+
+    container.innerHTML = "";
+
+    for (
+        const [drone, info]
+        of Object.entries(currentData.drones)
+    ) {
+
+        container.innerHTML += `
+            <div class="card">
+
+                <h3>🚁 ${drone}</h3>
+
+                <p>
+                    Battery ${info.battery}%
+                </p>
+
+                <p>
+                    Location: ${info.location}
+                </p>
+
+            </div>
+        `;
+    }
+}
+
+
+/* ============================================================
+   ZONE CARDS
+============================================================ */
+
+function renderZoneCards() {
+
+    const container =
+        document.getElementById("zoneCards");
+
+    container.innerHTML = "";
+
+    for (
+        const [zone, info]
+        of Object.entries(
+            currentData.emergency_zones
+        )
+    ) {
+
+        const css =
+            severityClass(info.severity);
+
+        container.innerHTML += `
+            <div class="card">
+
+                <h3>Zone ${zone}</h3>
+
+                <p>
+                    ${info.people} people affected
+                </p>
+
+                <span class="badge ${css}">
+                    ${info.severity.toUpperCase()}
+                </span>
+
+            </div>
+        `;
+    }
+}
+
+
+/* ============================================================
+   DYNAMIC CONTROLS
+============================================================ */
+
+function renderControls() {
+
+    const batteryContainer =
+        document.getElementById(
+            "batteryControls"
+        );
+
+    const zoneContainer =
+        document.getElementById(
+            "zoneControls"
+        );
+
+    batteryContainer.innerHTML = "";
+    zoneContainer.innerHTML = "";
+
+
+    /* -------------------------------
+       BATTERY CONTROLS
+    -------------------------------- */
+
+    for (
+        const [drone, info]
+        of Object.entries(currentData.drones)
+    ) {
+
+        batteryContainer.innerHTML += `
+            <div class="control-row">
+
+                <div class="control-header">
+
+                    <strong>
+                        ${drone}
+                    </strong>
+
+                    <span
+                        class="value"
+                        id="${drone}BatteryValue"
+                    >
+                        ${info.battery}%
+                    </span>
+
+                </div>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="${info.battery}"
+                    id="${drone}Battery"
+                    oninput="
+                        document.getElementById(
+                            '${drone}BatteryValue'
+                        ).textContent =
+                            this.value + '%'
+                    "
+                >
+
+            </div>
+        `;
+    }
+
+
+    /* -------------------------------
+       ZONE CONTROLS
+    -------------------------------- */
+
+    for (
+        const [zone, info]
+        of Object.entries(
+            currentData.emergency_zones
+        )
+    ) {
+
+        zoneContainer.innerHTML += `
+            <div class="zone-control">
+
+                <div class="zone-name">
+                    ${zone}
+                </div>
+
+                <div>
+
+                    <label>
+                        People affected
+                    </label>
+
+                    <input
+                        type="number"
+                        min="0"
+                        value="${info.people}"
+                        id="people${zone}"
+                    >
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Severity
+                    </label>
+
+                    <select id="severity${zone}">
+
+                        <option
+                            value="Critical"
+                            ${info.severity === "Critical"
+                                ? "selected"
+                                : ""}
+                        >
+                            Critical
+                        </option>
+
+                        <option
+                            value="High"
+                            ${info.severity === "High"
+                                ? "selected"
+                                : ""}
+                        >
+                            High
+                        </option>
+
+                        <option
+                            value="Medium"
+                            ${info.severity === "Medium"
+                                ? "selected"
+                                : ""}
+                        >
+                            Medium
+                        </option>
+
+                        <option
+                            value="Low"
+                            ${info.severity === "Low"
+                                ? "selected"
+                                : ""}
+                        >
+                            Low
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+        `;
+    }
+}
+
+
+/* ============================================================
+   UPDATE BACKEND DATA
+============================================================ */
+
+async function updateBackendData() {
+
+    const updatedDrones = {};
+    const updatedZones = {};
+
+
+    /* -------------------------------
+       DRONES
+    -------------------------------- */
+
+    for (
+        const drone
+        of Object.keys(currentData.drones)
+    ) {
+
+        updatedDrones[drone] = {
+
+            battery:
+                Number(
+                    document.getElementById(
+                        drone + "Battery"
+                    ).value
+                )
+
+        };
+    }
+
+
+    /* -------------------------------
+       ZONES
+    -------------------------------- */
+
+    for (
+        const zone
+        of Object.keys(
+            currentData.emergency_zones
+        )
+    ) {
+
+        updatedZones[zone] = {
+
+            people:
+                Number(
+                    document.getElementById(
+                        "people" + zone
+                    ).value
+                ),
+
+            severity:
+                document.getElementById(
+                    "severity" + zone
+                ).value
+        };
+    }
+
+
+    const response =
+        await fetch(
+            API_URL + "/api/update",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    drones:
+                        updatedDrones,
+
+                    emergency_zones:
+                        updatedZones
+                })
+            }
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Failed to update disaster data"
+        );
+    }
+
+
+    const result =
+        await response.json();
+
+    currentData.drones =
+        result.drones;
+
+    currentData.emergency_zones =
+        result.emergency_zones;
+
+    renderDroneCards();
+    renderZoneCards();
+}
+
+
+/* ============================================================
+   RUN QAOA
+============================================================ */
+
+async function runOptimization() {
+
+    addLog(
+        "Building QUBO optimization model..."
+    );
+
+    addLog(
+        "Executing QAOA parameter sweep..."
+    );
+
+
+    const response =
+        await fetch(
+            API_URL + "/api/optimize"
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "QAOA optimization failed"
+        );
+    }
+
+
+    const result =
+        await response.json();
+
+
+    addLog(
+        "QAOA execution completed: " +
+        result.successful_runs +
+        "/" +
+        result.total_runs +
+        " runs successful."
+    );
+
+
+    if (
+        !result.assignments ||
+        result.assignments.length === 0
+    ) {
+
+        throw new Error(
+            "No valid assignment received"
+        );
+    }
+
+
+    addLog(
+        "Valid assignment received."
+    );
+
+
+    addLog(
+        "Best bitstring: " +
+        result.bitstring
+    );
+
+
+    addLog(
+        "Best QAOA score: " +
+        Number(result.score).toFixed(2)
+    );
+
+
+    addLog(
+        "Assignment generated:"
+    );
+
+
+    for (
+        const assignment
+        of result.assignments
+    ) {
+
+        addLog(
+            assignment.drone +
+            " → Zone " +
+            assignment.zone
+        );
+    }
+
+
+    addLog(
+        "Zyntra optimization completed successfully."
+    );
+
+
+    updateAssignments(
+        result.assignments
+    );
+
+    updateMetrics(
+        result
+    );
+
+    return result;
+}
+
+
+/* ============================================================
+   UPDATE ASSIGNMENTS
+============================================================ */
+
+function updateAssignments(assignments) {
+
+    const container =
+        document.getElementById(
+            "assignmentCards"
+        );
+
+    container.innerHTML = "";
+
+
+    for (
+        const assignment
+        of assignments
+    ) {
+
+        const css =
+            severityClass(
+                assignment.severity
+            );
+
+
+        container.innerHTML += `
+            <div class="card assignment-card">
+
+                <div class="assignment-drone">
+                    🚁 ${assignment.drone}
+                </div>
+
+                <div class="assignment-zone">
+                    ${assignment.zone}
+                </div>
+
+                <span class="badge ${css}">
+                    ${assignment.severity}
+                </span>
+
+                <p>
+                    People:
+                    ${assignment.people}
+                </p>
+
+                <p>
+                    Distance:
+                    ${assignment.distance} units
+                </p>
+
+                <p>
+                    Battery:
+                    ${assignment.battery}%
+                </p>
+
+            </div>
+        `;
+    }
+}
+
+
+/* ============================================================
+   UPDATE METRICS
+============================================================ */
+
+function updateMetrics(result) {
+
+    document.getElementById(
+        "travelMetric"
+    ).textContent =
+        result.travel_cost;
+
+    document.getElementById(
+        "batteryMetric"
+    ).textContent =
+        result.battery_cost;
+
+    document.getElementById(
+        "peopleMetric"
+    ).textContent =
+        result.people_covered;
+
+    document.getElementById(
+        "scoreMetric"
+    ).textContent =
+        Number(result.score).toFixed(2);
+
+
+    /* QAOA comparison card */
+
+    document.getElementById(
+        "qaoaScore"
+    ).textContent =
+        Number(result.score).toFixed(2);
+
+    document.getElementById(
+        "qaoaTravel"
+    ).textContent =
+        result.travel_cost;
+
+    document.getElementById(
+        "qaoaBattery"
+    ).textContent =
+        result.battery_cost;
+
+    document.getElementById(
+        "qaoaPeople"
+    ).textContent =
+        result.people_covered;
+}
+
+
+/* ============================================================
+   REAL CLASSICAL VS QAOA COMPARISON
+============================================================ */
+
+async function updateComparison() {
+
+    addLog(
+        "Running classical baseline for comparison..."
+    );
+
+
+    const response =
+        await fetch(
+            API_URL + "/api/compare"
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Classical vs QAOA comparison failed"
+        );
+    }
+
+
+    const result =
+        await response.json();
+
+
+    const classical =
+        result.classical;
+
+    const qaoa =
+        result.qaoa;
+
+
+    /* -------------------------------
+       CLASSICAL
+    -------------------------------- */
+
+    document.getElementById(
+        "classicalScore"
+    ).textContent =
+        Number(
+            classical.score
+        ).toFixed(2);
+
+
+    document.getElementById(
+        "classicalTravel"
+    ).textContent =
+        classical.travel_cost;
+
+
+    document.getElementById(
+        "classicalBattery"
+    ).textContent =
+        classical.battery_cost;
+
+
+    document.getElementById(
+        "classicalPeople"
+    ).textContent =
+        classical.people_covered;
+
+
+    /* -------------------------------
+       QAOA
+    -------------------------------- */
+
+    document.getElementById(
+        "qaoaScore"
+    ).textContent =
+        Number(
+            qaoa.score
+        ).toFixed(2);
+
+
+    document.getElementById(
+        "qaoaTravel"
+    ).textContent =
+        qaoa.travel_cost;
+
+
+    document.getElementById(
+        "qaoaBattery"
+    ).textContent =
+        qaoa.battery_cost;
+
+
+    document.getElementById(
+        "qaoaPeople"
+    ).textContent =
+        qaoa.people_covered;
+
+
+    /* -------------------------------
+       WINNER
+    -------------------------------- */
+
+    let message = "";
+
+
+    if (result.winner === "QAOA") {
+
+        message =
+            "✓ QAOA produced the higher-scoring assignment";
+
+    }
+
+    else if (result.winner === "Classical") {
+
+        message =
+            "✓ Classical baseline produced the higher-scoring assignment";
+
+    }
+
+    else {
+
+        message =
+            "✓ QAOA recovered the same best score as the classical baseline";
+
+    }
+
+
+    document.getElementById(
+        "comparisonMessage"
+    ).textContent =
+        message;
+
+
+    /* -------------------------------
+       LOG
+    -------------------------------- */
+
+    addLog(
+        "Classical score: " +
+        Number(
+            classical.score
+        ).toFixed(2)
+    );
+
+
+    addLog(
+        "QAOA score: " +
+        Number(
+            qaoa.score
+        ).toFixed(2)
+    );
+
+
+    addLog(
+        "Comparison result: " +
+        result.winner
+    );
+}
+
+
+/* ============================================================
+   UPDATE + OPTIMIZE
+============================================================ */
+
+async function updateAndOptimize() {
+
+    const button =
+        document.getElementById(
+            "optimizeButton"
+        );
+
+
+    button.disabled = true;
+
+
+    button.textContent =
+        "⏳ UPDATING SCENARIO...";
+
+
+    try {
+
+        addLog(
+            "Loading updated disaster-response data..."
+        );
+
+
+        /* Update live scenario */
+
+        await updateBackendData();
+
+
+        addLog(
+            "Disaster scenario updated successfully."
+        );
+
+
+        /* Run QAOA */
+
+        button.textContent =
+            "⚛️ RUNNING QAOA...";
+
+
+        await runOptimization();
+
+
+        /* Run genuine comparison */
+
+        button.textContent =
+            "⚖️ COMPARING...";
+
+
+        await updateComparison();
+
+
+        button.textContent =
+            "✓ OPTIMIZATION & COMPARISON COMPLETE";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        addLog(
+            "ERROR: " +
+            error.message
+        );
+
+
+        button.textContent =
+            "⚠️ OPTIMIZATION FAILED";
+
+
+        alert(
+            "Zyntra optimization failed.\n\n" +
+            error.message
+        );
+    }
+
+
+    setTimeout(
+        () => {
+
+            button.disabled = false;
+
+            button.textContent =
+                "⚡ UPDATE & RUN QAOA";
+
+        },
+        2500
+    );
+}
+
+
+/* ============================================================
+   INITIALIZE
+============================================================ */
+
+loadData();
+
+</script>
+
+</body>
+</html>
